@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amigo.D.Cyber | Cybersecurity Expert</title>
+    
+    <!-- Fonts: Plus Jakarta Sans (Body) & JetBrains Mono (Code/Terminal) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --surface-color: rgba(20, 20, 20, 0.6);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #e0e0e0;
+            --text-secondary: #9ca3af;
+            --accent: #00ff9d; /* Cyber Green */
+            --accent-dim: rgba(0, 255, 157, 0.1);
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            --curve: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Terminal Cursor --- */
+        #cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--accent);
+            border-radius: 2px; /* Square for hacker vibe */
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            mix-blend-mode: difference;
+        }
+        
+        #cursor.hovered {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-dim);
+            border-color: transparent;
+        }
+
+        /* --- WebGL Background --- */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, rgba(5,5,5,0.4) 0%, #050505 90%);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(5,5,5,0.9), transparent);
+            backdrop-filter: blur(5px);
+        }
+
+        .brand {
+            font-family: var(--font-code);
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            letter-spacing: -0.05em;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link-wrapper {
+            position: relative;
+            padding: 5px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-family: var(--font-code);
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        /* --- Hero Section (Updated for Image) --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Mobile default: Stacked */
+            justify-content: center;
+            padding-top: 4rem;
+            gap: 6rem;
+        }
+
+        .hero-text-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-label {
+            font-family: var(--font-code);
+            color: var(--accent);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem); /* Adjusted slightly to fit layout */
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #5a5a5a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            font-family: var(--font-code);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .hero-location {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+
+        /* --- Profile Image Styling --- */
+        .hero-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .profile-img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            object-position: top; /* Focus on the top part of the image (head) */
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 30px var(--accent-dim);
+            filter: grayscale(100%); /* Start B&W for cool effect */
+            transition: filter 0.5s ease, transform 0.5s ease, border-color 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-img:hover {
+            filter: grayscale(0%); /* Color on hover */
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+
+        /* Rotating ring animation behind image (Optional Cyber effect) */
+        .hero-image-container::after {
+            content: '';
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            border: 1px dashed var(--surface-border);
+            animation: spin 10s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Desktop Layout: Side by Side */
+        @media (min-width: 900px) {
+            .hero {
+                flex-direction: row;
+                align-items: center;
+                text-align: left;
+            }
+            .hero-text-wrapper {
+                align-items: flex-start;
+            }
+        }
+
+        /* --- Terminal / Bio Section --- */
+        .terminal-section {
+            padding: 6rem 0;
+        }
+
+        .terminal-window {
+            background: #0d0d0d;
+            border: 1px solid var(--surface-border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .terminal-header {
+            background: #1a1a1a;
+            padding: 10px 15px;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--surface-border);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 10px;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .terminal-body {
+            padding: 2rem;
+            font-family: var(--font-code);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #d4d4d4;
+        }
+
+        .cmd { color: var(--accent); margin-right: 10px; }
+        .arg { color: #a5d6ff; }
+        .comment { color: #6a9955; display: block; margin: 10px 0 10px 25px; }
+        .string { color: #ce9178; }
+        
+        .blink {
+            animation: blinker 1s linear infinite;
+            color: var(--accent);
+        }
+
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        /* --- Tech Stack Grid (Arsenal) --- */
+        .arsenal-section {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            font-family: var(--font-code);
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-card {
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            padding: 2rem;
+            border-radius: 8px;
+            transition: all 0.3s var(--curve);
+        }
+
+        .tech-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            background: rgba(0, 255, 157, 0.05);
+        }
+
+        .tech-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .tech-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-code);
+        }
+
+        .tech-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* --- Social Grid (Transmission) --- */
+        .network-section {
+            padding: 6rem 0 10rem 0;
+        }
+
+        .network-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: var(--surface-color);
+            border: 1px solid var(--surface-border);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            transition: all 0.3s var(--curve);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            opacity: 0.1;
+            transition: left 0.3s var(--curve);
+        }
+
+        .social-link:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .social-link:hover::before {
+            left: 0;
+        }
+
+        /* --- Footer --- */
+        footer {
+            border-top: 1px solid var(--surface-border);
+            padding: 3rem 0;
+            text-align: center;
+            font-family: var(--font-code);
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .arch-badge {
+            margin-top: 1rem;
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #333;
+            color: #333;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Terminal Cursor -->
+    <div id="cursor"></div>
+
+    <!-- WebGL Background (Subtle Dark Data Flow) -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="brand interactive">
+            AMIGO<span style="color:#fff">.</span>D<span style="color:#fff">.</span>CYBER
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-link-wrapper interactive">
+                <a href="#about" class="nav-link">/Bio</a>
+            </li>
+            <li class="nav-link-wrapper interactive">
+                <a href="#arsenal" class="nav-link">/Arsenal</a>
+            </li>
+            <li class="nav-link-wrapper interactive">
+                <a href="#network" class="nav-link">/Connect</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            
+            <!-- Left Side: Text -->
+            <div class="hero-text-wrapper">
+                <div class="hero-label">&lt;root_access /&gt;</div>
+                <h1>BUILDING.<br>BREAKING.<br>SECURING.</h1>
+                <div class="hero-sub">
+                    Certified IT & Cybersecurity Expert. Privacy-conscious. Learning by reversing, building, and breaking things intentionally.
+                </div>
+                <div class="hero-location interactive">
+                    <span>🇷🇼 Kigali, Rwanda</span>
+                    <span style="opacity:0.5">|</span>
+                    <span>🐧 Arch Linux User</span>
+                    <span style="opacity:0.5">|</span>
+                    <span>🏊‍♀️ Swimmer</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Image -->
+            <div class="hero-image-container interactive">
+                <!-- REPLACE THE LINK BELOW WITH YOUR OWN IMAGE URL -->
+                <img src="2picofme.png" alt="Amigo.D.Cyber Profile" class="profile-img">
+            </div>
+
+        </section>
+
+        <!-- Terminal Bio -->
+        <section id="about" class="terminal-section">
+            <div class="terminal-window interactive tilt-card">
+                <div class="terminal-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                    <div class="terminal-title">user@arch-laptop: ~/profile</div>
+                </div>
+                <div class="terminal-body">
+                    <div><span class="cmd">$</span><span class="arg">cat</span> identity.txt</div>
+                    <div class="comment"># Retreiving user profile...</div>
+                    <div style="margin-top:10px;">
+                        Name: <span class="string">"Amigo.D.Cyber"</span> (aka Cyb3r)<br>
+                        Role: <span class="string">"Certified IT & Cybersecurity Expert"</span><br>
+                        Status: <span class="string">"Always Learning"</span><br>
+                        OS: <span class="string">"Arch Linux"</span> (I see you, Windows)<br>
+                        Vibe: <span class="string">"Terminal-heavy workflow"</span>
+                    </div>
+                    <br>
+                    <div><span class="cmd">$</span><span class="arg">echo</span> $HOBBIES</div>
+                    <div style="margin-top:5px;">Swimming, System Tinkering, Deep Tech Experiments</div>
+                    <br>
+                    <div><span class="cmd">$</span><span class="arg">./run_motd.sh</span></div>
+                    <div style="margin-top:5px; color: var(--accent);">"CYBER 👨‍💻 ❤️🖤🤍 GOD"</div>
+                    <br>
+                    <div><span class="cmd">$</span><span class="blink">_</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Arsenal -->
+        <section id="arsenal" class="arsenal-section">
+            <div class="section-header">
+                <h2 class="section-title">The Arsenal</h2>
+                <div class="section-subtitle">SKILLS & TOOLS</div>
+            </div>
+            <div class="stack-grid">
+                <div class="tech-card interactive">
+                    <div class="tech-icon">🔐</div>
+                    <h3>Cyber Security</h3>
+                    <p>Ethical hacking, pentesting, IT Specialist. Breaking things to make them secure.</p>
+                </div>
+                <div class="tech-card interactive">
+                    <div class="tech-icon">💻</div>
+                    <h3>Programming</h3>
+                    <p>C++, Python (Advanced), Bash Shell scripting. I build the tools I need.</p>
+                </div>
+                <div class="tech-card interactive">
+                    <div class="tech-icon">📱</div>
+                    <h3>Mobile & Firmware</h3>
+                    <p>Android flashing, rooting, and firmware research. Low-level mobile control.</p>
+                </div>
+                <div class="tech-card interactive">
+                    <div class="tech-icon">🐧</div>
+                    <h3>Linux Master</h3>
+                    <p>Full Arch Linux fan. System tinkering, privacy, and total control.</p>
+                </div>
+                <div class="tech-card interactive">
+                    <div class="tech-icon">🎨</div>
+                    <h3>Web</h3>
+                    <p>HTML, CSS. Designing interfaces for the tools I build.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Network / Socials -->
+        <section id="network" class="network-section">
+            <div class="section-header">
+                <h2 class="section-title">Establish Connection</h2>
+                <div class="section-subtitle">TRANSMISSION PROTOCOLS</div>
+            </div>
+            <div class="network-grid">
+                <a href="https://linktr.ee/Amigo.D.Cyber" target="_blank" class="social-link interactive" style="grid-column: span 2; background: var(--accent); color: #000; font-weight:bold;">
+                    ALL LINKS HUB (Linktree)
+                </a>
+                <a href="https://www.youtube.com/@CyberMafiaX" target="_blank" class="social-link interactive">YouTube</a>
+                <a href="https://www.instagram.com/amigo.d.cyber" target="_blank" class="social-link interactive">Instagram</a>
+                <a href="https://www.facebook.com/amigo.d.cyber" target="_blank" class="social-link interactive">Facebook</a>
+                <a href="https://www.tiktok.com/@amigo.d.cyber" target="_blank" class="social-link interactive">TikTok</a>
+                <a href="https://x.com/MafiaCyberX" target="_blank" class="social-link interactive">X (Twitter)</a>
+                <a href="https://www.snapchat.com/add/amigo-cyber" target="_blank" class="social-link interactive">Snapchat</a>
+                <a href="https://www.pinterest.com/amigodcyber/" target="_blank" class="social-link interactive">Pinterest</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div>&copy; 2023 Amigo.D.Cyber. All systems operational.</div>
+        <div class="arch-badge">Built on Arch Linux</div>
+    </footer>
+
+    <script>
+        /**
+         * 1. CUSTOM CURSOR
+         */
+        const cursor = document.getElementById('cursor');
+        const interactiveElements = document.querySelectorAll('.interactive');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        /**
+         * 2. THREE.JS SHADER (Subtle Matrix/Data Flow)
+         */
+        const initShader = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.PlaneGeometry(2, 2);
+
+            const uniforms = {
+                u_time: { value: 0 },
+                u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+            };
+
+            // Dark, data-streaming shader
+            const fragmentShader = `
+                uniform float u_time;
+                uniform vec2 u_resolution;
+
+                float random (in vec2 _st) {
+                    return fract(sin(dot(_st.xy, vec2(12.9898,78.233)))* 43758.5453123);
+                }
+
+                float noise (in vec2 _st) {
+                    vec2 i = floor(_st);
+                    vec2 f = fract(_st);
+                    float a = random(i);
+                    float b = random(i + vec2(1.0, 0.0));
+                    float c = random(i + vec2(0.0, 1.0));
+                    float d = random(i + vec2(1.0, 1.0));
+                    vec2 u = f * f * (3.0 - 2.0 * f);
+                    return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+                }
+
+                void main() {
+                    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+                    st.x *= u_resolution.x/u_resolution.y;
+
+                    vec2 pos = vec2(st*3.0);
+                    float DF = 0.0;
+
+                    float a = 0.0;
+                    vec2 vel = vec2(u_time*.1);
+                    DF += noise(pos+vel)*.25+.25;
+
+                    a = noise(pos*vec2(cos(u_time*0.1),sin(u_time*0.1))*0.1)*3.1415;
+                    vel = vec2(cos(a),sin(a));
+                    DF += noise(pos+vel)*.25+.25;
+
+                    // Dark charcoal base
+                    vec3 color = vec3(0.05, 0.05, 0.05);
+                    
+                    // Subtle green accents based on noise
+                    color += vec3(0.0, DF*0.05, 0.0);
+
+                    gl_FragColor = vec4(color,1.0);
+                }
+            `;
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                fragmentShader: fragmentShader,
+                vertexShader: `void main() { gl_Position = vec4( position, 1.0 ); }`
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                uniforms.u_time.value += 0.01;
+                renderer.render(scene, camera);
+            };
+
+            animate();
+            
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                uniforms.u_resolution.value.x = window.innerWidth;
+                uniforms.u_resolution.value.y = window.innerHeight;
+            });
+        };
+        initShader();
+
+        /**
+         * 3. 3D TILT (For Terminal Window)
+         */
+        const card = document.querySelector('.terminal-window');
+        
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -5; // Slight tilt
+            const rotateY = ((x - centerX) / centerX) * 5;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.01)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+
+    </script>
+</body>
+</html>
