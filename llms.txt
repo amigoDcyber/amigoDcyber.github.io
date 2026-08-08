@@ -1,0 +1,23 @@
+# Manzi Amigo Reussi (Manzi Amigo Cyber)
+
+> Certified IT & cybersecurity professional and backend developer from Kigali, Rwanda. Ethical hacking, security research, Wi-Fi auditing tools, mobile firmware.
+
+## About
+Manzi Amigo Reussi, a.k.a. Manzi Amigo Cyber (dcyber), is a cybersecurity professional and backend developer affiliated with Globoris Technologies in Kigali, Rwanda. He builds open-source security tools (AirShatter, Airmonitor, OnionDownOda), works on mobile firmware research, and develops Flutter and Rust applications.
+
+## Key facts
+- Name: Manzi Amigo Reussi
+- Aliases: Manzi Amigo Cyber, Amigo.D.Cyber, dcyber
+- Location: Kigali, Rwanda
+- Role: Cybersecurity Professional & Backend Developer
+- Projects: AirShatter (Wi-Fi auditing), Airmonitor (network monitoring), Precision Lens (Flutter QR scanner), OnionDownOda (Rust Tor downloader), DFLIXER (dflixer.pages.dev — free movies & live sports)
+
+## Links
+- Site: https://amigodcyber.github.io/
+- GitHub: https://github.com/manziamigocyber
+- LinkedIn: https://www.linkedin.com/in/manziamigo
+- Instagram: https://www.instagram.com/manziamigocyber
+- YouTube: https://www.youtube.com/@manziamigocyber
+- TikTok: https://www.tiktok.com/@manziamigocyber
+- X: https://x.com/MafiaCyberX
+- Linktree: https://linktr.ee/manziamigocyber
