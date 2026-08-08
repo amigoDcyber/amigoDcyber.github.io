@@ -13,7 +13,7 @@ Manzi Amigo Reussi, a.k.a. Manzi Amigo Cyber (dcyber), is a cybersecurity profes
 - Projects: AirShatter (Wi-Fi auditing), Airmonitor (network monitoring), Precision Lens (Flutter QR scanner), OnionDownOda (Rust Tor downloader), DFLIXER (dflixer.pages.dev — free movies & live sports)
 
 ## Links
-- Site: https://amigodcyber.github.io/
+- Site: https://manziamigocyber.github.io/
 - GitHub: https://github.com/manziamigocyber
 - LinkedIn: https://www.linkedin.com/in/manziamigo
 - Instagram: https://www.instagram.com/manziamigocyber
